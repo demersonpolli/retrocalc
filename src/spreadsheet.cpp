@@ -2,6 +2,7 @@
 #include "terminal.h"
 #include "display.h"
 #include "matrix.h"
+#include "parser.h"
 #include <iostream>
 #include <cctype>
 #include <cstdio>
@@ -197,7 +198,8 @@ void runSpreadsheet() {
                 if (!view.inputBuffer.empty()) {
                     Cell cell;
                     if (view.inputType == InputType::Value) {
-                        cell.setValue(view.inputBuffer, 0.0);
+                        double val = parseValue(view.inputBuffer, matrix);
+                        cell.setValue(view.inputBuffer, val);
                     } else if (view.inputType == InputType::Label) {
                         cell.setLabel(view.inputBuffer);
                     }
@@ -316,5 +318,4 @@ void runSpreadsheet() {
     showCursor();
     restoreTerminal();
     clearScreen();
-    std::cout << "Goodbye!" << std::endl;
 }
