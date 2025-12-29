@@ -26,7 +26,94 @@ void runSpreadsheet() {
     while (running) {
         int key = getKey();
 
-        if (view.inputType == InputType::Goto) {
+        if (view.inputType == InputType::LoadFilename) {
+            if (key == KEY_ESC) {
+                view.inputType = InputType::None;
+                view.inputBuffer.clear();
+                drawSpreadsheetScreen(view, matrix);
+            } else if (key == '\r' || key == '\n') {
+                if (!view.inputBuffer.empty()) {
+                    matrix.loadFromFile(view.inputBuffer);
+                }
+                view.inputType = InputType::None;
+                view.inputBuffer.clear();
+                drawSpreadsheetScreen(view, matrix);
+            } else if (key == 127 || key == 8) {
+                if (!view.inputBuffer.empty()) {
+                    view.inputBuffer.pop_back();
+                    drawSpreadsheetScreen(view, matrix);
+                }
+            } else if (key >= 32 && key < 127) {
+                view.inputBuffer += static_cast<char>(key);
+                drawSpreadsheetScreen(view, matrix);
+            }
+        } else if (view.inputType == InputType::SaveFilename) {
+            if (key == KEY_ESC) {
+                view.inputType = InputType::None;
+                view.inputBuffer.clear();
+                drawSpreadsheetScreen(view, matrix);
+            } else if (key == '\r' || key == '\n') {
+                if (!view.inputBuffer.empty()) {
+                    matrix.saveToFile(view.inputBuffer);
+                }
+                view.inputType = InputType::None;
+                view.inputBuffer.clear();
+                drawSpreadsheetScreen(view, matrix);
+            } else if (key == 127 || key == 8) {
+                if (!view.inputBuffer.empty()) {
+                    view.inputBuffer.pop_back();
+                    drawSpreadsheetScreen(view, matrix);
+                }
+            } else if (key >= 32 && key < 127) {
+                view.inputBuffer += static_cast<char>(key);
+                drawSpreadsheetScreen(view, matrix);
+            }
+        } else if (view.inputType == InputType::Storage) {
+            if (key == 'Q' || key == 'q') {
+                running = false;
+            } else if (key == 'S' || key == 's') {
+                if (!matrix.filename.empty()) {
+                    matrix.saveToFile();
+                } else {
+                    view.inputType = InputType::SaveFilename;
+                    view.inputBuffer.clear();
+                    drawSpreadsheetScreen(view, matrix);
+                    continue;
+                }
+            } else if (key == 'L' || key == 'l') {
+                view.inputType = InputType::LoadFilename;
+                view.inputBuffer.clear();
+                drawSpreadsheetScreen(view, matrix);
+                continue;
+            }
+            view.inputType = InputType::None;
+            drawSpreadsheetScreen(view, matrix);
+        } else if (view.inputType == InputType::Command) {
+            if (key == 'B' || key == 'b') {
+                matrix.clearCell(view.cursorRow, view.cursorCol);
+            } else if (key == 'C' || key == 'c') {
+                matrix.clearAll();
+            } else if (key == 'E' || key == 'e') {
+                const Cell* cell = matrix.getCellPtr(view.cursorRow, view.cursorCol);
+                if (cell && !cell->isEmpty()) {
+                    view.mode = EditMode::Editing;
+                    if (cell->type == CellType::Value) {
+                        view.inputType = InputType::Value;
+                    } else if (cell->type == CellType::Label) {
+                        view.inputType = InputType::Label;
+                    }
+                    view.inputBuffer = cell->getText();
+                    drawSpreadsheetScreen(view, matrix);
+                    continue;
+                }
+            } else if (key == 'S' || key == 's') {
+                view.inputType = InputType::Storage;
+                drawSpreadsheetScreen(view, matrix);
+                continue;
+            }
+            view.inputType = InputType::None;
+            drawSpreadsheetScreen(view, matrix);
+        } else if (view.inputType == InputType::Goto) {
             if (key == KEY_ESC) {
                 view.inputType = InputType::None;
                 view.inputBuffer.clear();
@@ -90,10 +177,6 @@ void runSpreadsheet() {
             }
         } else {
             switch (key) {
-                case KEY_ESC:
-                    running = false;
-                    break;
-
                 case KEY_ARROW_UP:
                     if (view.cursorRow > 0) {
                         view.cursorRow--;
@@ -137,6 +220,11 @@ void runSpreadsheet() {
                 case '>':
                     view.inputType = InputType::Goto;
                     view.inputBuffer.clear();
+                    drawSpreadsheetScreen(view, matrix);
+                    break;
+
+                case '/':
+                    view.inputType = InputType::Command;
                     drawSpreadsheetScreen(view, matrix);
                     break;
 

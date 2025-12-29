@@ -12,12 +12,18 @@ enum class CalcMode {
 class Matrix {
 public:
     CalcMode calcMode = CalcMode::Column;
+    std::string filename;
+
     Cell* getCellPtr(int row, int col);
     const Cell* getCellPtr(int row, int col) const;
 
     void setCell(int row, int col, const Cell& cell);
     bool hasCell(int row, int col) const;
     void clearCell(int row, int col);
+    void clearAll();
+    bool saveToFile(const std::string& fname);
+    bool saveToFile();
+    bool loadFromFile(const std::string& fname);
 
     int getRowCount() const { return MAX_ROWS; }
     int getColCount() const { return MAX_COLS; }

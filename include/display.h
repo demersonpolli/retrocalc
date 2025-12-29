@@ -17,7 +17,11 @@ enum class InputType {
     Value,
     Label,
     Repeating,
-    Goto
+    Goto,
+    Command,
+    Storage,
+    SaveFilename,
+    LoadFilename
 };
 
 struct SpreadsheetView {

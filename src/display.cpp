@@ -161,7 +161,13 @@ void drawSpreadsheetScreen(const SpreadsheetView& view, const Matrix& matrix) {
         } else if (row == 2) {
             setReverse(true);
             std::string row2Content;
-            if (view.mode == EditMode::Editing) {
+            if (view.inputType == InputType::Command) {
+                row2Content = "COMMAND: BCDEFGIMPRSTVW-";
+            } else if (view.inputType == InputType::Storage) {
+                row2Content = "STORAGE:   L S D I Q #";
+            } else if (view.inputType == InputType::SaveFilename || view.inputType == InputType::LoadFilename) {
+                row2Content = "Type the file name";
+            } else if (view.mode == EditMode::Editing) {
                 switch (view.inputType) {
                     case InputType::Value: row2Content = "Value"; break;
                     case InputType::Label: row2Content = "Label"; break;
@@ -170,12 +176,12 @@ void drawSpreadsheetScreen(const SpreadsheetView& view, const Matrix& matrix) {
                 }
             }
             std::cout << row2Content;
-            for (int col = row2Content.length() + 1; col <= termCols; col++) {
+            for (size_t col = row2Content.length() + 1; col <= (size_t)termCols; col++) {
                 std::cout << ' ';
             }
         } else if (row == 3) {
             setReverse(false);
-            if (view.mode == EditMode::Editing || view.inputType == InputType::Goto) {
+            if (view.mode == EditMode::Editing || view.inputType == InputType::Goto || view.inputType == InputType::SaveFilename || view.inputType == InputType::LoadFilename) {
                 std::cout << view.inputBuffer;
                 for (size_t col = view.inputBuffer.length() + 1; col <= (size_t)termCols; col++) {
                     std::cout << ' ';
