@@ -4,6 +4,8 @@
 #include "matrix.h"
 #include <iostream>
 #include <cctype>
+#include <cstdio>
+#include <fstream>
 
 static bool isValueTrigger(int ch) {
     return std::isdigit(ch) || ch == '+' || ch == '-' || ch == '(' || ch == '.' || ch == '#' || ch == '@';
@@ -26,7 +28,41 @@ void runSpreadsheet() {
     while (running) {
         int key = getKey();
 
-        if (view.inputType == InputType::LoadFilename) {
+        if (view.inputType == InputType::DeleteConfirm) {
+            if (key == 'Y' || key == 'y') {
+                std::remove(view.inputBuffer.c_str());
+            }
+            view.inputType = InputType::None;
+            view.inputBuffer.clear();
+            drawSpreadsheetScreen(view, matrix);
+        } else if (view.inputType == InputType::DeleteFilename) {
+            if (key == KEY_ESC) {
+                view.inputType = InputType::None;
+                view.inputBuffer.clear();
+                drawSpreadsheetScreen(view, matrix);
+            } else if (key == '\r' || key == '\n') {
+                if (!view.inputBuffer.empty()) {
+                    std::ifstream file(view.inputBuffer);
+                    if (file.good()) {
+                        file.close();
+                        view.inputType = InputType::DeleteConfirm;
+                        drawSpreadsheetScreen(view, matrix);
+                        continue;
+                    }
+                }
+                view.inputType = InputType::None;
+                view.inputBuffer.clear();
+                drawSpreadsheetScreen(view, matrix);
+            } else if (key == 127 || key == 8) {
+                if (!view.inputBuffer.empty()) {
+                    view.inputBuffer.pop_back();
+                    drawSpreadsheetScreen(view, matrix);
+                }
+            } else if (key >= 32 && key < 127) {
+                view.inputBuffer += static_cast<char>(key);
+                drawSpreadsheetScreen(view, matrix);
+            }
+        } else if (view.inputType == InputType::LoadFilename) {
             if (key == KEY_ESC) {
                 view.inputType = InputType::None;
                 view.inputBuffer.clear();
@@ -82,6 +118,11 @@ void runSpreadsheet() {
                 }
             } else if (key == 'L' || key == 'l') {
                 view.inputType = InputType::LoadFilename;
+                view.inputBuffer.clear();
+                drawSpreadsheetScreen(view, matrix);
+                continue;
+            } else if (key == 'D' || key == 'd') {
+                view.inputType = InputType::DeleteFilename;
                 view.inputBuffer.clear();
                 drawSpreadsheetScreen(view, matrix);
                 continue;

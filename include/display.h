@@ -21,7 +21,9 @@ enum class InputType {
     Command,
     Storage,
     SaveFilename,
-    LoadFilename
+    LoadFilename,
+    DeleteFilename,
+    DeleteConfirm
 };
 
 struct SpreadsheetView {
