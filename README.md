@@ -1,8 +1,8 @@
-# VisiCalc
+# RetroCalc
 
 ## Description
 
-An open source implementation of VisiCalc.
+An open source implementation of a clone of VisiCalc.
 
 ## Building
 
