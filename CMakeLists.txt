@@ -6,4 +6,4 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
 include_directories(include)
 
-add_executable(retrocalc src/main.cpp)
+add_executable(retrocalc src/main.cpp src/welcome.cpp src/spreadsheet.cpp src/matrix.cpp src/terminal.cpp src/display.cpp)

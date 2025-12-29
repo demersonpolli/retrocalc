@@ -1,11 +1,8 @@
-#include <iostream>
+#include "welcome.h"
+#include "spreadsheet.h"
 
 int main() {
-    std::cout << "\n==============================\n";
-    std::cout << "      RETROCALC (C++)         \n";
-    std::cout << "==============================\n";
-    std::cout << "\nCross-platform C++ starter\n";
-    std::cout << "Compatible with Linux, Unix, Mac, Windows\n";
-    std::cout << "\n";
+    showWelcomeScreen();
+    runSpreadsheet();
     return 0;
 }
