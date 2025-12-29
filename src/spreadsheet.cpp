@@ -9,6 +9,10 @@ static bool isValueTrigger(int ch) {
     return std::isdigit(ch) || ch == '+' || ch == '-' || ch == '(' || ch == '.' || ch == '#' || ch == '@';
 }
 
+static bool isLabelTrigger(int ch) {
+    return std::isalpha(ch) || ch == '\'';
+}
+
 void runSpreadsheet() {
     initTerminal();
     hideCursor();
@@ -64,7 +68,11 @@ void runSpreadsheet() {
             } else if (key == '\r' || key == '\n') {
                 if (!view.inputBuffer.empty()) {
                     Cell cell;
-                    cell.setValue(view.inputBuffer, 0.0);
+                    if (view.inputType == InputType::Value) {
+                        cell.setValue(view.inputBuffer, 0.0);
+                    } else if (view.inputType == InputType::Label) {
+                        cell.setLabel(view.inputBuffer);
+                    }
                     matrix.setCell(view.cursorRow, view.cursorCol, cell);
                 }
                 view.mode = EditMode::Normal;
@@ -140,10 +148,34 @@ void runSpreadsheet() {
                     drawSpreadsheetScreen(view, matrix);
                     break;
 
+                case KEY_F2:
+                    {
+                        const Cell* cell = matrix.getCellPtr(view.cursorRow, view.cursorCol);
+                        if (cell && !cell->isEmpty()) {
+                            view.mode = EditMode::Editing;
+                            if (cell->type == CellType::Value) {
+                                view.inputType = InputType::Value;
+                            } else if (cell->type == CellType::Label) {
+                                view.inputType = InputType::Label;
+                            }
+                            view.inputBuffer = cell->getText();
+                            if (!view.inputBuffer.empty()) {
+                                view.inputBuffer.pop_back();
+                            }
+                            drawSpreadsheetScreen(view, matrix);
+                        }
+                    }
+                    break;
+
                 default:
                     if (isValueTrigger(key)) {
                         view.mode = EditMode::Editing;
                         view.inputType = InputType::Value;
+                        view.inputBuffer = std::string(1, static_cast<char>(key));
+                        drawSpreadsheetScreen(view, matrix);
+                    } else if (isLabelTrigger(key)) {
+                        view.mode = EditMode::Editing;
+                        view.inputType = InputType::Label;
                         view.inputBuffer = std::string(1, static_cast<char>(key));
                         drawSpreadsheetScreen(view, matrix);
                     }

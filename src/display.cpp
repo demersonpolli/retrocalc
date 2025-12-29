@@ -217,10 +217,14 @@ void drawSpreadsheetScreen(const SpreadsheetView& view, const Matrix& matrix) {
 
                 const Cell* cell = matrix.getCellPtr(sheetRow, sheetCol);
                 std::string cellDisplay;
-                if (cell && !cell->isEmpty() && cell->type == CellType::Value) {
-                    std::ostringstream oss;
-                    oss << cell->getValue();
-                    cellDisplay = oss.str();
+                if (cell && !cell->isEmpty()) {
+                    if (cell->type == CellType::Value) {
+                        std::ostringstream oss;
+                        oss << cell->getValue();
+                        cellDisplay = oss.str();
+                    } else if (cell->type == CellType::Label) {
+                        cellDisplay = cell->getText();
+                    }
                 }
 
                 if (cellDisplay.length() > DEFAULT_COL_WIDTH) {

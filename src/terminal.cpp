@@ -27,6 +27,7 @@ int getKey() {
             case 75: return KEY_ARROW_LEFT;
             case 77: return KEY_ARROW_RIGHT;
             case 59: return KEY_F1;
+            case 60: return KEY_F2;
         }
     }
     return c;
@@ -69,10 +70,12 @@ int getKey() {
                     unsigned char fkey;
                     if (read(STDIN_FILENO, &fkey, 1) == 1) {
                         if (fkey == 'A') return KEY_F1;
+                        if (fkey == 'B') return KEY_F2;
                     }
                 }
             } else if (seq[0] == 'O') {
                 if (seq[1] == 'P') return KEY_F1;
+                if (seq[1] == 'Q') return KEY_F2;
             }
             return KEY_ESC;
         }
